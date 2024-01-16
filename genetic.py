@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from ai_model import *
 
 # Function to calculate total distance of a path in a complete graph
 def calculate_total_distance(path, graph):
@@ -41,14 +42,28 @@ def crossover(parent1, parent2):
 
 
 # # Mutation function(Swap)
-def mutation(child):
-    mutation_point1 = np.random.randint(0, len(child))
-    mutation_point2 = np.random.randint(0, len(child))
+def mutation(original_sequence,predicted_mutation):
+        
+        # Select the index with the highest probability
+        max_prob_index = np.argmax(predicted_mutation)
+        mutation_index = max_prob_index
+        # print("Mutation index: {}".format(mutation_index))
 
-    # Swap 2 nodes positions
-    child[mutation_point1], child[mutation_point2] = child[mutation_point2], child[mutation_point1]
+        mutated_sequence = original_sequence.copy()
+    
+        sorted_indices = np.argsort(predicted_mutation[0])[::-1]
 
-    return child
+        # Select the second index
+        second_index = sorted_indices[1]
+        # print("Second Mutation index: {}".format(second_index))
+        
+        # Perform the swap
+        mutated_sequence[mutation_index], mutated_sequence[second_index] = (
+            mutated_sequence[second_index],
+            mutated_sequence[mutation_index]
+        )
+
+        return mutated_sequence
 
 # Generate random list
 def generate_random_lists(n, num_lists):
@@ -64,7 +79,7 @@ def generate_random_lists(n, num_lists):
 def genetic_algorithm(graph, population_size, generations):
     # Population initialization
     population = generate_random_lists(len(graph[0]), population_size)
-
+    model = create_model(sequence_length=len(graph[0]), num_genes=len(graph[0]), num_features=1)
     for generation in range(generations):
         # Selection
         selected_population = selection(population, graph)
@@ -80,8 +95,9 @@ def genetic_algorithm(graph, population_size, generations):
 
         # Mutation
         for i in range(len(new_population)):
-            if np.random.rand() < 0.1:  # Arbitrary mutation rate
-                new_population[i] = mutation(new_population[i])
+            encoded_solution = np.array([new_population[i]])
+            predicted_mutation = model.predict(encoded_solution)
+            new_population[i] = mutation(new_population[i], predicted_mutation=predicted_mutation)
 
         # Fitness evaluation
         population = sorted(new_population, key=lambda x: calculate_total_distance(x, graph))
