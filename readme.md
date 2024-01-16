@@ -10,7 +10,7 @@ This Python implementation solves the Travelling Salesman Problem (TSP), which i
 
 - **Population Initialization:** The initial population of solutions is generated intelligently using [explain how you generate the initial population].
 
-- **Crossover and Mutation:** Genetic operators such as crossover and mutation are applied to evolve the population towards better solutions.
+- **Crossover and Mutation:** Genetic operators such as crossover and mutation are applied to evolve the population towards better solutions. Mutqtion operqtion in this program is done AI guarded using tensorflow and keras
 
 ## Getting Started
 ### Prerequisites
